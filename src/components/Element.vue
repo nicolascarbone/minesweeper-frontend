@@ -15,13 +15,16 @@
   export default {
     name: 'Element',
     props: ['row', 'cell', 'grid'],
-    data: function() {
+    data: () => {
+
       return {
         isBomb: false,
         isFlagged: false
       }
+
     },
     methods: {
+
       flagCell: function(row, cell) {
 
         if (this.isFlagged) return;
@@ -33,16 +36,18 @@
             cells: this.cells,
             mines: this.mines
           })
-          .then(function (response) {
+          .then((response) => {
 
             this.isBomb = response.body.is_bomb;
             this.isFlagged = true;
-            if (this.isBomb) {
-              this.$root.$emit('game-over');
-            }
+
+            // Wait a bit until is-flagged class is set
+            setTimeout(() => {
+              this.$root.$emit('flag-cell', this.isBomb);
+            }, 100)
 
           })
-          .catch(function (error) {
+          .catch((error) => {
             console.log(error)
           });
       }

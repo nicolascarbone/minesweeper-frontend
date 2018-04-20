@@ -47,6 +47,14 @@
 
     <br/><br/>
 
+    <div v-if="gameOver && !gameFinished">
+      Game Over!!!!
+    </div>
+
+    <div v-if="gameFinished">
+      Game Finished!!!!
+    </div>
+
     <div v-if="startTime && !gameOver">
 
       <p>Game started at {{ startTime }}</p>
@@ -66,10 +74,6 @@
 
     </div>
 
-    <div v-if="gameOver">
-      Game Over!!!!
-    </div>
-
   </div>
 
 </template>
@@ -87,7 +91,8 @@
     components: {
       Element
     },
-    data: function() {
+    data:() => {
+
       return {
         startTime: '',
         rows: 5,
@@ -95,30 +100,36 @@
         mines: 5,
         grid: 0,
         gameOver: false,
-        olderGames: false
+        olderGames: false,
+        gameFinished: false
       }
+
     },
     watch: {
-      rows: function(newVal, oldVal) {
+      rows: (newVal, oldVal) => {
         this.rows = ~~this.rows;
       },
-      cells: function(newVal, oldVal) {
+      cells: (newVal, oldVal) => {
         this.cells = ~~this.cells;
       }
     },
     mounted() {
 
-      const that = this;
+      this.$root.$on('flag-cell', (isBomb) => {
 
-      this.$root.$on('game-over', function()  {
-        that.gameOver = true;
+
+        this.gameOver = isBomb;
+        const cleanElements = this.rows * this.cells - this.mines;
+        const flaggedCells = document.querySelectorAll('.is-flagged');
+        this.gameFinished = (cleanElements === flaggedCells.length);
+
       });
 
       // Get older games for logged in user
       this
         .$http
         .get(`${constants.baseApiUrl}/grids/`)
-        .then(function (response) {
+        .then((response) => {
           this.olderGames = response.body;
         });
 
@@ -134,7 +145,7 @@
         this
           .$http
           .get(`${constants.baseApiUrl}/grids/${game.pk}`)
-          .then(function (response) {
+          .then((response) => {
 
             const grid = response.body;
 
@@ -168,11 +179,11 @@
             cells: this.cells,
             mines: this.mines
           })
-          .then(function (response) {
+          .then((response) => {
             // Save grid pk to be passed in to the elements
             this.grid = response.body.pk;
           })
-          .catch(function (error) {
+          .catch((error) => {
             console.log(error)
           });
 
