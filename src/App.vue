@@ -1,24 +1,35 @@
 <template>
   <div id="app">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+    <div class="container-fluid">
+      <router-view></router-view>
+    </div>
   </div>
 </template>
 
 <script>
 
-import HelloWorld from './components/HelloWorld.vue'
+import MineSweeper from './components/MineSweeper.vue'
 
 export default {
   name: 'app',
   components: {
-    HelloWorld
+    MineSweeper
   },
   created() {
-
-    this.$root.$on('check-root', (element) => {
-      // this.$root.$broadcast('check', element);
-    });
+    this.checkLogin();
   },
+  updated () {
+    this.checkLogin();
+  },
+  methods: {
+
+    checkLogin: function() {
+      if (!localStorage.token && this.$route.path !== '/login' && this.$route.path !== '/signin') {
+        this.$router.push('/login?redirect=game')
+      }
+    }
+
+  }
 }
 
 </script>
