@@ -67,7 +67,7 @@
   }
 
   .is-flagged {
-    background-color: gray;
+    background-color: lightgrey;
   }
 
 </style>

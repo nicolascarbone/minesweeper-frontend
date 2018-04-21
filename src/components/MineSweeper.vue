@@ -2,6 +2,8 @@
 
   <div>
 
+    <a href="#" v-on:click="logout()">Logout</a>
+
     <div class="container">
 
       <div class="row">
@@ -174,6 +176,11 @@
     },
     methods: {
 
+      logout: function() {
+        delete localStorage.token;
+        this.$router.push('/login');
+      },
+
       /**
        * Number of mines can't be greater than
        * the grid number of elements
@@ -246,7 +253,7 @@
           refreshRateMS: 100,		// How often the clock should be updated
           almostDoneMS: 10000, 	// When counting down - this event will fire with this many milliseconds remaining on the clock
         }
-        const timer = new Stopwatch(20000, options);
+        const timer = new Stopwatch(60000, options);
 
         timer.start()
 
