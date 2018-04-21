@@ -27,7 +27,7 @@ export default {
   },
   updated () {
     if (localStorage.token) {
-      this.$router.replace(this.$route.query.redirect || '/game')
+      this.$router.replace(this.$route.query.redirect || '/')
     }
   },
   methods: {
@@ -58,7 +58,7 @@ export default {
 
       this.error = false
       localStorage.token = req.data.token
-      this.$router.replace(this.$route.query.redirect || '/game')
+      this.$router.replace(this.$route.query.redirect || '/')
 
     },
 

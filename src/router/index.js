@@ -14,7 +14,7 @@ export default new Router({
       component: Login
     },
     {
-      path: '/game',
+      path: '/',
       name: 'Game',
       component: MineSweeper
     },

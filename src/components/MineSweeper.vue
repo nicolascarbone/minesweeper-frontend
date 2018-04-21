@@ -155,13 +155,16 @@
 
       this.$root.$on('flag-cell', (isBomb) => {
 
+        if (this.gameFinished) return;
+
         this.gameOver = isBomb;
-
-        if (this.gameOver) {}
-
         const cleanElements = this.rows * this.cells - this.mines;
         const flaggedCells = document.querySelectorAll('.is-flagged');
-        this.gameFinished = (cleanElements === flaggedCells.length);
+        this.gameFinished = (cleanElements === flaggedCells.length) && !this.gameOver;
+
+        if (this.gameOver || this.gameFinished) {
+          this.stopTimer();
+        }
 
       });
 
@@ -209,10 +212,10 @@
 
             // Restart game removing game over flag
             this.gameOver = false;
+            this.gameFinished = false;
 
             // Set up a new start date
             this.startTimer();
-            // this.startTime = new Date();
 
             // Set up game data
             this.grid = grid.pk;
@@ -247,19 +250,24 @@
 
       },
 
+      stopTimer: function() {
+        this.timer.stop();
+      },
+
       startTimer: function() {
 
         const options = {
           refreshRateMS: 100,		// How often the clock should be updated
           almostDoneMS: 10000, 	// When counting down - this event will fire with this many milliseconds remaining on the clock
         }
-        const timer = new Stopwatch(60000, options);
 
-        timer.start()
+        this.timer = new Stopwatch(60000, options);
+
+        this.timer.start()
 
         var that = this;
 
-        timer.onTime(function(time) {
+        this.timer.onTime(function(time) {
           that.startTime = parseFloat(time.ms / 1000).toFixed(2);
           if (that.startTime <= 10) {
             that.timeIsAlmostDone = true;
@@ -267,13 +275,12 @@
         });
 
         // Fires when the timer is done
-        timer.onDone(function(){
+        this.timer.onDone(function(){
           that.gameFinished = !that.gameOver;
         });
 
         // Fires when the timer is almost complete - default is 10 seconds remaining. Change with 'almostDoneMS' option
-        timer.onAlmostDone(function() {
-          console.log('Timer is almost complete');
+        this.timer.onAlmostDone(function() {
           that.timeIsAlmostDone = true;
         });
 
@@ -295,6 +302,8 @@
           .then((response) => {
             // Save grid pk to be passed in to the elements
             this.grid = response.body.pk;
+            this.gameOver = false;
+            this.gameFinished = false;
             this.startTimer();
           });
 
