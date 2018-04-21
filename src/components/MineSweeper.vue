@@ -8,7 +8,7 @@
 
       <div class="row">
 
-        <div class="col-4">
+        <div class="col-5">
 
           <div v-if="showError">{{ errorMessage }}</div>
 
@@ -61,7 +61,7 @@
 
         </div>
 
-        <div class="col-8">
+        <div class="col-7">
 
           <div v-if="gameOver && !gameFinished">
             Game Over!!!!
@@ -139,15 +139,15 @@
 
     },
     watch: {
-      rows: function(newVal, oldVal) {
+      rows: function() {
         this.rows = ~~this.rows;
         this.validateNumberOfMines();
       },
-      cells: function(newVal, oldVal) {
+      cells: function() {
         this.cells = ~~this.cells;
         this.validateNumberOfMines();
       },
-      mines: function(newVal, oldVal) {
+      mines: function() {
         this.validateNumberOfMines();
       }
     },
@@ -179,9 +179,14 @@
     },
     methods: {
 
+      /**
+       * Logout and redirect to login page
+      */
       logout: function() {
+
         delete localStorage.token;
         this.$router.push('/login');
+
       },
 
       /**
@@ -189,12 +194,14 @@
        * the grid number of elements
       */
       validateNumberOfMines: function() {
+
         if (this.mines > (this.rows * this.cells)) {
           this.showError = true;
           this.errorMessage = "The number of mines can't be greather than the grid number of elements";
         } else {
           this.showError = false;
         }
+
       },
 
       /**
@@ -235,10 +242,10 @@
 
         this
           .$http
-          .delete(`${constants.baseApiUrl}/grids/${gameId}`)
-          .then(function(response) {
+          .delete(`${constants.baseApiUrl}/grids/${gameId}/`)
+          .then(function() {
 
-            this.startTime = null;
+            this.gameOver = true;
 
             // Search game in list
             const olderGameIndex = this.olderGames.findIndex(game => game.pk === gameId);
@@ -250,15 +257,22 @@
 
       },
 
+      /**
+       * Stop the current running timer
+      */
       stopTimer: function() {
         this.timer.stop();
       },
 
+      /**
+       * Start a timer for the current game
+       * Show an alert if the time is running out
+      */
       startTimer: function() {
 
         const options = {
-          refreshRateMS: 100,		// How often the clock should be updated
-          almostDoneMS: 10000, 	// When counting down - this event will fire with this many milliseconds remaining on the clock
+          refreshRateMS: 100,
+          almostDoneMS: 10000,
         }
 
         this.timer = new Stopwatch(60000, options);
@@ -268,10 +282,12 @@
         var that = this;
 
         this.timer.onTime(function(time) {
+
           that.startTime = parseFloat(time.ms / 1000).toFixed(2);
           if (that.startTime <= 10) {
             that.timeIsAlmostDone = true;
           }
+
         });
 
         // Fires when the timer is done
